@@ -3,7 +3,7 @@
 // ====================================================================================
 
 // GANTI dengan URL Google Script Anda yang sudah di-deploy
-const scriptURL = "https://script.google.com/macros/s/AKfycbyAyLg7YBrguhmv0R_vnCmyX7-drEsHhvR-_cXhvnXESUGs4E1CYzdsJZMbgAAKK8LX/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbynNa_F0glZnNXio_PblBdk9vpc_rFIuG9Z5eSBXyyiADKaKTCXAsX_rwyyyNg0pA3u/exec";
 
 // GANTI dengan Kunci Rahasia Anda. HARUS SAMA PERSIS dengan yang Anda simpan di Google Script.
 const API_KEY = "WhenStellariaMjk";

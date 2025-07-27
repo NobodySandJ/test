@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // =================================================================
     // || KONFIGURasi ADMIN                                           ||
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAyLg7YBrguhmv0R_vnCmyX7-drEsHhvR-_cXhvnXESUGs4E1CYzdsJZMbgAAKK8LX/exec"; // <-- GANTI DENGAN URL BARU SETELAH DEPLOY
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbynNa_F0glZnNXio_PblBdk9vpc_rFIuG9Z5eSBXyyiADKaKTCXAsX_rwyyyNg0pA3u/exec"; // <-- GANTI DENGAN URL BARU SETELAH DEPLOY
     const ADMIN_USER = "SkpnMjk";
     const ADMIN_PASS = "whenSmjk";
     const API_KEY = "WhenStellariaMjk";
@@ -121,11 +121,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.appendChild(script);
     }
 
-    // Fungsi untuk merender tabel pesanan dengan nomor urut
+    // Fungsi untuk merender tabel pesanan (tanpa checklist)
     function renderTable(data) {
         ordersTbody.innerHTML = '';
         if (data.length === 0) {
-             ordersTbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">No orders found.</td></tr>';
+             ordersTbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">No orders found.</td></tr>';
              return;
         }
 
@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const tr = document.createElement('tr');
             
             tr.innerHTML = `
-                <td class="text-center">${index + 1}</td>
                 <td>${new Date(row.Timestamp).toLocaleString('id-ID')}</td>
                 <td>${row.Nama}</td>
                 <td>${row.Email}</td>
