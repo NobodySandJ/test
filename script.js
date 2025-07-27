@@ -282,7 +282,7 @@ function addToCart(name, fullName, image) {
   renderCartItems();
   const notification = document.createElement("div");
   notification.className =
-    "fixed bottom-5 right-5 bg-slate-200 text-slate-800 px-5 py-3 rounded-lg shadow-2xl text-sm font-semibold transform-gpu transition-all duration-300 translate-y-4 opacity-0";
+    "fixed bottom-5 right-5 bg-purple-600 text-white px-5 py-3 rounded-lg shadow-2xl text-sm font-semibold transform-gpu transition-all duration-300 translate-y-4 opacity-0";
   notification.textContent = `${name} added to cart!`;
   document.body.appendChild(notification);
   setTimeout(() => {
