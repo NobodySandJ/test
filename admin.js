@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     // =================================================================
-    // || KONFIGURASI ADMIN (JANGAN UBAH JIKA TIDAK PERLU) ||
+    // || KONFIGURasi ADMIN                                           ||
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAyLg7YBrguhmv0R_vnCmyX7-drEsHhvR-_cXhvnXESUGs4E1CYzdsJZMbgAAKK8LX/exec"; // URL Google Script yang sama
-    const ADMIN_USER = "admin";
-    const ADMIN_PASS = "admin1";
-    const API_KEY = "WhenStellariaMjk"; // Kunci Rahasia yang sama
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAyLg7YBrguhmv0R_vnCmyX7-drEsHhvR-_cXhvnXESUGs4E1CYzdsJZMbgAAKK8LX/exec"; // <-- GANTI DENGAN URL ANDA
+    const ADMIN_USER = "mjkwhen";
+    const ADMIN_PASS = "mjkwhens";
+    const API_KEY = "WhenStellariaMjk";
 
     // =================================================================
-    // || Elemen DOM ||
+    // || Elemen DOM                                                  ||
     // =================================================================
     const loginSection = document.getElementById('login-section');
     const adminDashboard = document.getElementById('admin-dashboard');
@@ -21,22 +21,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const ordersTbody = document.getElementById('orders-tbody');
     const totalRevenueEl = document.getElementById('total-revenue');
     const memberSummaryEl = document.getElementById('member-summary');
-
-    // =================================================================
-    // || FUNGSI UTAMA ||
-    // =================================================================
-
-        const togglePasswordButton = document.getElementById('toggle-password');
+    const togglePasswordButton = document.getElementById('toggle-password');
     const passwordInput = document.getElementById('password');
     const toggleIcon = document.getElementById('toggle-icon');
+    
+    // =================================================================
+    // || FUNGSI UTAMA                                                ||
+    // =================================================================
 
+    // Fungsi untuk menampilkan/menyembunyikan password
     if (togglePasswordButton) {
         togglePasswordButton.addEventListener('click', function() {
-            // Ganti tipe input dari password ke text atau sebaliknya
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
 
-            // Ganti ikon mata
             if (type === 'password') {
                 toggleIcon.classList.remove('fa-eye-slash');
                 toggleIcon.classList.add('fa-eye');
@@ -45,11 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 toggleIcon.classList.add('fa-eye-slash');
             }
         });
-    }
-
-    // Cek status login saat halaman dimuat
-    if (sessionStorage.getItem('isAdminAuthenticated') === 'true') {
-        showDashboard();
     }
 
     // Cek status login saat halaman dimuat
@@ -77,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.removeItem('isAdminAuthenticated');
         showLogin();
     });
-
+    
     // Handler untuk refresh data
     refreshButton.addEventListener('click', fetchData);
 
@@ -96,42 +89,43 @@ document.addEventListener('DOMContentLoaded', function () {
     async function fetchData() {
         loader.style.display = 'block';
         ordersTable.classList.add('hidden');
-
+        
         try {
             const response = await fetch(`${SCRIPT_URL}?action=getOrders&apiKey=${API_KEY}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
             if (data.error) {
                 throw new Error(data.error);
             }
-
+            
             renderTable(data);
             calculateSummary(data);
 
         } catch (error) {
             console.error('Error fetching data:', error);
-            alert(`Failed to fetch data: ${error.message}`);
             loader.innerHTML = `<p class="text-red-500">Failed to load data. Please try again.</p>`;
         } finally {
-            loader.style.display = 'none';
-            ordersTable.classList.remove('hidden');
+            // Kita tidak menyembunyikan loader di sini lagi agar pesan error tetap terlihat
+            // tapi kita pastikan tabel tidak muncul jika ada error
+            if (loader.innerHTML.includes('Failed')) {
+                ordersTable.classList.add('hidden');
+            } else {
+                loader.style.display = 'none';
+                ordersTable.classList.remove('hidden');
+            }
         }
     }
 
-    // Fungsi untuk merender tabel pesanan
+    // Fungsi untuk merender tabel pesanan dengan nomor urut
     function renderTable(data) {
         ordersTbody.innerHTML = '';
-        data.forEach(row => {
+        data.forEach((row, index) => {
             const tr = document.createElement('tr');
-            const isDone = row.Status === 'DONE';
-            tr.className = isDone ? 'status-done' : '';
-
+            
             tr.innerHTML = `
-                <td>
-                    <input type="checkbox" class="status-checkbox w-5 h-5 rounded" data-row-id="${row.Timestamp}" ${isDone ? 'checked' : ''}>
-                </td>
+                <td class="text-center">${index + 1}</td>
                 <td>${new Date(row.Timestamp).toLocaleString('id-ID')}</td>
                 <td>${row.Nama}</td>
                 <td>${row.Email}</td>
@@ -142,47 +136,6 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
             ordersTbody.appendChild(tr);
         });
-
-        // Tambah event listener untuk checkbox
-        document.querySelectorAll('.status-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', updateStatus);
-        });
-    }
-
-    // Fungsi untuk mengupdate status 'DONE'
-    async function updateStatus(event) {
-        const checkbox = event.target;
-        const timestamp = checkbox.dataset.rowId;
-        const isChecked = checkbox.checked;
-        const status = isChecked ? 'DONE' : '';
-
-        checkbox.disabled = true;
-
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'updateStatus',
-                    apiKey: API_KEY,
-                    timestamp: timestamp,
-                    status: status
-                })
-            });
-            const result = await response.json();
-            if (result.result !== 'success') {
-                throw new Error(result.message || 'Unknown error');
-            }
-            // Toggle style setelah berhasil
-            checkbox.closest('tr').classList.toggle('status-done', isChecked);
-        } catch (error) {
-            console.error('Error updating status:', error);
-            alert('Failed to update status. Please refresh and try again.');
-            // Revert checkbox state on failure
-            checkbox.checked = !isChecked;
-        } finally {
-            checkbox.disabled = false;
-        }
     }
 
     // Fungsi untuk kalkulasi rangkuman
@@ -208,12 +161,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (memberCounts.hasOwnProperty(memberName)) {
                         memberCounts[memberName] += quantity;
                     } else if (memberName === "Group Cheki") {
-                        memberCounts['Group Cheki'] += quantity;
+                         memberCounts['Group Cheki'] += quantity;
                     }
                 }
             });
         });
-
+        
         memberSummaryEl.innerHTML = '';
         for (const member in memberCounts) {
             memberSummaryEl.innerHTML += `
