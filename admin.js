@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // =================================================================
     // || KONFIGURasi ADMIN                                           ||
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAyLg7YBrguhmv0R_vnCmyX7-drEsHhvR-_cXhvnXESUGs4E1CYzdsJZMbgAAKK8LX/exec"; // <-- GANTI DENGAN URL ANDA
-    const ADMIN_USER = "mjkwhen";
-    const ADMIN_PASS = "mjkwhens";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAyLg7YBrguhmv0R_vnCmyX7-drEsHhvR-_cXhvnXESUGs4E1CYzdsJZMbgAAKK8LX/exec"; // <-- GANTI DENGAN URL BARU SETELAH DEPLOY
+    const ADMIN_USER = "SkpnMjk";
+    const ADMIN_PASS = "whenSmjk";
     const API_KEY = "WhenStellariaMjk";
 
     // =================================================================
@@ -85,17 +85,18 @@ document.addEventListener('DOMContentLoaded', function () {
         adminDashboard.classList.add('hidden');
     }
 
-    // Fungsi untuk mengambil data dari Google Sheet
-    async function fetchData() {
+    // Fungsi untuk mengambil data dari Google Sheet menggunakan metode JSONP
+    function fetchData() {
         loader.style.display = 'block';
         ordersTable.classList.add('hidden');
-        
-        try {
-            const response = await fetch(`${SCRIPT_URL}?action=getOrders&apiKey=${API_KEY}`);
-            if (!response.ok) {
-                 throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
+        loader.innerHTML = '<p class="text-lg">Loading data, please wait...</p>';
+
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+
+        window[callbackName] = function(data) {
+            loader.style.display = 'none';
+            ordersTable.classList.remove('hidden');
+
             if (data.error) {
                 throw new Error(data.error);
             }
@@ -103,24 +104,31 @@ document.addEventListener('DOMContentLoaded', function () {
             renderTable(data);
             calculateSummary(data);
 
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            loader.innerHTML = `<p class="text-red-500">Failed to load data. Please try again.</p>`;
-        } finally {
-            // Kita tidak menyembunyikan loader di sini lagi agar pesan error tetap terlihat
-            // tapi kita pastikan tabel tidak muncul jika ada error
-            if (loader.innerHTML.includes('Failed')) {
-                ordersTable.classList.add('hidden');
-            } else {
-                loader.style.display = 'none';
-                ordersTable.classList.remove('hidden');
-            }
-        }
+            document.body.removeChild(script);
+            delete window[callbackName];
+        };
+
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?action=getOrders&apiKey=${API_KEY}&callback=${callbackName}`;
+
+        script.onerror = function() {
+            loader.innerHTML = `<p class="text-red-500">Failed to load data. Please check the script URL and your connection.</p>`;
+            ordersTable.classList.add('hidden');
+            document.body.removeChild(script);
+            delete window[callbackName];
+        };
+
+        document.body.appendChild(script);
     }
 
     // Fungsi untuk merender tabel pesanan dengan nomor urut
     function renderTable(data) {
         ordersTbody.innerHTML = '';
+        if (data.length === 0) {
+             ordersTbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">No orders found.</td></tr>';
+             return;
+        }
+
         data.forEach((row, index) => {
             const tr = document.createElement('tr');
             
@@ -140,11 +148,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Fungsi untuk kalkulasi rangkuman
     function calculateSummary(data) {
-        // Total Pendapatan
         const totalRevenue = data.reduce((sum, row) => sum + parseFloat(row.Total || 0), 0);
         totalRevenueEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalRevenue);
 
-        // Rangkuman per member
         const memberCounts = {
             'NAE': 0, 'YUNA': 0, 'ALICE': 0, 'MELODY': 0, 'ELLA': 0, 'Group Cheki': 0
         };
