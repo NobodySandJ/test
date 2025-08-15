@@ -12,14 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const updateThemeColor = (color) => {
             root.style.setProperty('--accent-color', color);
-            const glowColor = color + '40';
+            const glowColor = color + '40'; // Menambahkan transparansi untuk efek glow
             root.style.setProperty('--glow-color', glowColor);
         };
 
+        // Event listener untuk slider tahun
         yearSlider.addEventListener('input', (e) => {
             yearDisplay.textContent = e.target.value;
         });
 
+        // Event listener untuk pilihan tema warna
         themeOptions.addEventListener('click', (e) => {
             if (e.target.classList.contains('theme-option')) {
                 themeOptions.querySelector('.selected')?.classList.remove('selected');
@@ -29,14 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Event listener untuk tombol kado
         giftBox.addEventListener('click', () => {
             const selectedYear = yearSlider.value;
-            const selectedColorElement = themeOptions.querySelector('.selected');
-            const selectedColor = selectedColorElement.dataset.color;
+            const selectedColor = themeOptions.querySelector('.selected').dataset.color;
             const encodedColor = encodeURIComponent(selectedColor);
+
+            // Mengarahkan ke halaman ucapan dengan parameter
             window.location.href = `ucapan.html?year=${selectedYear}&color=${encodedColor}`;
         });
 
+        // Atur warna tema awal saat halaman dimuat
         const initialColor = themeOptions.querySelector('.selected').dataset.color;
         updateThemeColor(initialColor);
     }
@@ -45,9 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // LOGIKA UNTUK HALAMAN ucapan.html (HALAMAN UCAPAN)
     // ===================================================================
     if (document.getElementById('main-content') && !document.getElementById('welcome-screen')) {
-        
-        const appState = { content: {} };
 
+        const appState = {
+            content: {},
+            currentTrackIndex: 0
+        };
+
+        // Cache semua elemen DOM untuk akses lebih cepat
         const elements = {
             root: document.documentElement,
             backgroundAnimation: document.getElementById('background-animation'),
@@ -72,22 +81,24 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const utils = {
+            // Fungsi typewriter effect
             async typewriter(element, text, delay = 80) {
-                // Kosongkan elemen sebelum memulai
                 element.innerHTML = '';
                 element.classList.add('typing');
                 for (let i = 0; i < text.length; i++) {
                     element.innerHTML = text.substring(0, i + 1) + '<span class="cursor">|</span>';
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
-                // Hapus kursor setelah selesai
                 setTimeout(() => {
                     element.innerHTML = text;
                     element.classList.remove('typing');
                 }, 500);
             },
+
+            // Fungsi untuk memicu confetti dengan jumlah adaptif
             triggerConfetti() {
-                const confettiCount = 150;
+                // OPTIMASI: Kurangi jumlah confetti di layar kecil
+                const confettiCount = window.innerWidth < 768 ? 75 : 150;
                 const colors = ['#ff6b9d', '#4ecdc4', '#feca57', '#ff9ff3', '#54a0ff'];
                 for (let i = 0; i < confettiCount; i++) {
                     const confetti = document.createElement('div');
@@ -100,7 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => confetti?.remove(), 8000);
                 }
             },
-            createBgParticles(count = 35) {
+
+            // Fungsi untuk membuat partikel latar belakang dengan jumlah adaptif
+            createBgParticles() {
+                 // OPTIMASI: Kurangi jumlah partikel di layar kecil
+                const count = window.innerWidth < 768 ? 20 : 35;
                 const shapes = ['💖', '✨', '🌟', '🎶', '🎉', '♍', '🎀', '🎂'];
                 for (let i = 0; i < count; i++) {
                     const particle = document.createElement('div');
@@ -114,12 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     elements.backgroundAnimation.appendChild(particle);
                 }
             },
+
+            // Fungsi untuk update progress bar scroll
             updateScrollProgress() {
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                 const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
                 const scrollProgress = (scrollTop / scrollHeight) * 100;
                 elements.progressBar.style.width = `${Math.min(scrollProgress, 100)}%`;
             },
+
+            // Fungsi untuk mengamati elemen saat masuk viewport
             observeElements() {
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
@@ -128,6 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
                 document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
             },
+
+            // Fungsi untuk memperbarui warna tema
             updateThemeColor(color) {
                 elements.root.style.setProperty('--accent-color', color);
                 const colorMap = {'#ff6b9d':'#4ecdc4', '#4ecdc4':'#ff6b9d', '#a88679':'#ff6b9d', '#e91e63':'#4ecdc4', '#673ab7':'#4ecdc4', '#00bcd4':'#ff6b9d', '#4caf50':'#ff6b9d', '#ff9800':'#4ecdc4'};
@@ -137,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const contentRenderer = {
+            // Render timeline dari data JSON
             renderTimeline() {
                 elements.timelineContainer.innerHTML = appState.content.timelineItems.map((item, index) => {
                     const side = index % 2 === 0 ? 'left' : 'right';
@@ -151,9 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>`;
                 }).join('');
             },
+
+            // Render galeri dari data JSON
             renderGallery() {
-                elements.photoGallery.innerHTML = appState.content.galleryImages.map((src, i) => `<img src="${src}" alt="Foto Kenangan ${i + 1}" loading="lazy">`).join('');
+                // OPTIMASI: Tambahkan decoding="async" untuk performa rendering
+                elements.photoGallery.innerHTML = appState.content.galleryImages.map((src, i) => `<img src="${src}" alt="Foto Kenangan ${i + 1}" loading="lazy" decoding="async">`).join('');
             },
+
+            // Render video dari data JSON
             renderVideos() {
                 elements.videoList.innerHTML = appState.content.videos.map(video => `<div class="video-wrapper"><iframe src="${video.url}" title="${video.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`).join('');
             }
@@ -228,15 +255,14 @@ document.addEventListener('DOMContentLoaded', () => {
             async init() {
                 try {
                     const response = await fetch('content.json');
-                    if (!response.ok) throw new Error('Failed to load content');
+                    if (!response.ok) throw new Error('Gagal memuat konten');
                     appState.content = await response.json();
-                    
+
                     const params = new URLSearchParams(window.location.search);
                     const year = params.get('year') || 2006;
                     const color = decodeURIComponent(params.get('color') || '#ff6b9d');
                     utils.updateThemeColor(color);
-                    
-                    // Inisialisasi semua konten visual dulu
+
                     utils.createBgParticles();
                     contentRenderer.renderTimeline();
                     contentRenderer.renderGallery();
@@ -247,32 +273,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     utils.updateScrollProgress();
                     utils.triggerConfetti();
 
-                    // Siapkan teks, tapi jangan langsung animasikan
                     const age = new Date().getFullYear() - parseInt(year, 10);
                     const greeting1 = appState.content.personalGreeting;
                     const greeting2 = `yang ke-${age}! 🎉`;
-                    const personalMessage = appState.content.personalMessage;
-                    const signature = appState.content.personalSignature;
 
-                    // Mulai animasi teks secara berurutan
                     await utils.typewriter(elements.greetingLine1, greeting1, 100);
                     await utils.typewriter(elements.greetingLine2, greeting2, 120);
-                    
-                    // Beri jeda sebelum pesan pribadi muncul
+
                     await new Promise(resolve => setTimeout(resolve, 300));
-                    
-                    await utils.typewriter(elements.personalMessage, personalMessage, 30);
 
-                    // Tampilkan signature setelah semua animasi teks selesai
-                    elements.personalSignature.textContent = signature;
-                    elements.personalSignature.style.opacity = 1;
+                    await utils.typewriter(elements.personalMessage, appState.content.personalMessage, 30);
+                    elements.personalSignature.textContent = appState.content.personalSignature;
 
-                    // Mulai musik setelah jeda singkat
                     setTimeout(() => musicPlayer.play(), 500);
 
                 } catch (error) {
                     console.error('Error initializing app:', error);
-                    document.body.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; color: var(--text-light); font-family: 'Poppins', sans-serif; padding: 1rem;"><div><h1>😔 Oops! Terjadi Kesalahan</h1><p>Tidak dapat memuat konten website. Pastikan file <strong>content.json</strong> ada di folder yang sama.</p><button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer;">🔄 Coba Lagi</button></div></div>`;
+                    document.body.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; color: var(--text-light); font-family: 'Poppins', sans-serif; padding: 1rem;"><div><h1>😔 Oops! Terjadi Kesalahan</h1><p>Tidak dapat memuat konten website. Pastikan file <strong>content.json</strong> ada dan bisa diakses.</p><button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer;">🔄 Coba Lagi</button></div></div>`;
                 }
             }
         };
