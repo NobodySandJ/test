@@ -1,723 +1,281 @@
-// ====================================================================================
-// || PENGATURAN UTAMA WEBSITE (EDIT DI SINI) ||
-// ====================================================================================
+document.addEventListener('DOMContentLoaded', () => {
 
-// GANTI dengan URL Google Script Anda yang sudah di-deploy
-const scriptURL = "https://script.google.com/macros/s/AKfycbynNa_F0glZnNXio_PblBdk9vpc_rFIuG9Z5eSBXyyiADKaKTCXAsX_rwyyyNg0pA3u/exec";
+    // ===================================================================
+    // LOGIKA UNTUK HALAMAN index.html (HALAMAN SELAMAT DATANG)
+    // ===================================================================
+    if (document.getElementById('welcome-screen')) {
+        const yearSlider = document.getElementById('birthyear-slider');
+        const yearDisplay = document.getElementById('year-display');
+        const themeOptions = document.getElementById('theme-options');
+        const giftBox = document.getElementById('lottie-gift-container');
+        const root = document.documentElement;
 
-// GANTI dengan Kunci Rahasia Anda. HARUS SAMA PERSIS dengan yang Anda simpan di Google Script.
-const API_KEY = "WhenStellariaMjk";
+        const updateThemeColor = (color) => {
+            root.style.setProperty('--accent-color', color);
+            const glowColor = color + '40';
+            root.style.setProperty('--glow-color', glowColor);
+        };
 
-const CONFIG = {
-  hargaMemberCheki: 25000,
-  hargaGroupCheki: 30000,
-};
+        yearSlider.addEventListener('input', (e) => {
+            yearDisplay.textContent = e.target.value;
+        });
 
-// ====================================================================================
-// || EDIT FAQ DI SINI ||
-// ====================================================================================
-const faqs = [
-  {
-    question: "Apa itu Cheki?",
-    answer:
-      "Cheki adalah foto instan (seperti polaroid) yang diambil bersama member idol. Ini adalah cara populer bagi fans untuk mendapatkan kenang-kenangan pribadi dengan idola favorit mereka.",
-  },
-  {
-    question: "Bagaimana jika saya berhalangan hadir di event?",
-    answer:
-      "Tidak masalah. Jika Anda sudah membayar, Cheki Anda akan tetap diambil oleh tim kami. Kami bisa mengirimkannya ke alamat Anda (ongkos kirim ditanggung pemesan) atau bisa Anda ambil di event berikutnya. Silakan hubungi contact person kami.",
-  },
-  {
-    question: "Bolehkah saya meminta pose tertentu saat Cheki?",
-    answer:
-      "Tentu saja! Selama posenya sopan dan tidak melanggar aturan, Anda bebas berekspresi bersama member. Diskusikan pose yang Anda inginkan dengan member saat giliran Anda.",
-  },
-  {
-    question: "Apakah tiket Cheki bisa digunakan di event lain?",
-    answer:
-      "Tiket Cheki yang dibeli untuk satu event hanya berlaku untuk event tersebut, kecuali ada pengumuman khusus dari kami. Ini untuk memastikan semua fans mendapatkan kesempatan yang sama di setiap acara.",
-  },
-];
-
-// ====================================================================================
-// || EDIT LINEUP UNTUK EVENT TERDEKAT DI SINI ||
-// ====================================================================================
-const NEXT_EVENT_LINEUP = {
-  eventTitle: "Ma chung university",
-  lineup: {
-    nae: true,
-    yuna: true,
-    alice: true,
-    melody: true,
-    ella: true,
-  },
-};
-
-// ====================================================================================
-// || EDIT JADWAL EVENT DI SINI ||
-// ====================================================================================
-const events = [
-  {
-    date: "27 Juli 2025",
-    title: "Ma chung university",
-    time: "2:00 PM - 5:00 PM",
-    status: "upcoming",
-  },
-];
-
-// ====================================================================================
-// || EDIT DATA MEMBER DI SINI ||
-// ====================================================================================
-const members = {
-  nae: {
-    name: "Nae",
-    fullName: "🧡NAE🧡",
-    color: "text-orange-400",
-    jiko: "Ba~ kyun!! Cahaya cinta yang menembus hatimu! Nyahoo~ Aku Nae ^,^♪",
-    ig: "evilnae_",
-    tiktok: "evilnae",
-    photos: [
-      "foto/Nae.jpg",
-      "foto/gallery/f-nae1.jpg",
-      "foto/gallery/f-nae2.jpg",
-    ],
-    tanggallahir: "19 February",
-    zodiac: "Pisces",
-    tinggibadan: "157cm",
-    goldarah: "AB",
-    mbti: "ENFJ",
-    hobi: "Cosplay, Menyanyi",
-    makananfavorit: "Bebek, Tiramisu Cake, Mango, Taro",
-    warnafavorit: "Merah, Orange, purple",
-  },
-  yuna: {
-    name: "Yuna",
-    fullName: "💛YUNA💛",
-    color: "text-yellow-400",
-    jiko: "Seperti madu yang ‘kan maniskan hari harimu, Halo, aku Yunaaa~! 🐝✨",
-    ig: "hokaitto",
-    tiktok: "hokaitto",
-    photos: [
-      "foto/Yuna.jpg",
-      "foto/gallery/f-yuna1.jpg",
-      "foto/gallery/f-yuna2.jpg",
-    ],
-    tanggallahir: "27 Desember",
-    zodiac: "Capricorn",
-    tinggibadan: "157cm",
-    goldarah: "B",
-    mbti: "INTJ",
-    hobi: "Makeup & Dress up, Cosplay, Tidur",
-    makananfavorit:
-      "Mie nyemek pake nugget, Apapun ga beracun (opsional)",
-    warnafavorit: "Ungu, Hitam, Biru, Kuning",
-  },
-  alice: {
-    name: "Alice",
-    fullName: "💜ALICE💜",
-    color: "text-purple-400",
-    jiko: "Si gadis ceria yang akan membawa kamu ke Wornderlad Panggil aku Alice~ 🐰✨",
-    ig: "alicelyn__",
-    tiktok: "arisurisuu_",
-    photos: [
-      "foto/Alice.jpg",
-      "foto/gallery/f-alice1.jpg",
-      "foto/gallery/f-alice2.jpg",
-    ],
-    tanggallahir: "7 November",
-    zodiac: "Scorpio",
-    tinggibadan: "160cm",
-    goldarah: "O",
-    mbti: "ENFJ",
-    hobi: "Wotagei, Fotography, Gaming",
-    makananfavorit: "Susu Stroberi, Roti, Sushi, Martabak",
-    warnafavorit: "Putih, Ungu, Hitam",
-  },
-  melody: {
-    name: "Melody",
-    fullName: "❤️MELODY❤️",
-    color: "text-red-500",
-    jiko: "Seperti lagu favoritmu, bolehkah aku selalu temani hari-harimu? Halo, aku Melody! 🎵🍒",
-    ig: "lodehehe",
-    tiktok: "mango.sodium",
-    photos: [
-      "foto/Melody.jpg",
-      "foto/gallery/f-melody1.jpg",
-      "foto/gallery/f-melody2.jpg",
-    ],
-    tanggallahir: "13 November",
-    zodiac: "Scorpio",
-    tinggibadan: "155cm",
-    goldarah: "O",
-    mbti: "ENFP",
-    hobi: "Membaca, Menulis, Baking, Nailart",
-    makananfavorit: "Coklat, Mangga, Telor gulung",
-    warnafavorit: "Biru, Putih, Merah",
-  },
-  ella: {
-    name: "Ella",
-    fullName: "💚ELLA💚",
-    color: "text-green-500",
-    jiko: "Seniman introvert yang akan melukis senyuman di wajahmu! Halo, aku Ella~ 🎨✨",
-    ig: "salmonelix",
-    tiktok: "salmonelix",
-    photos: [
-      "foto/Ella.jpg",
-      "foto/gallery/f-ella1.jpg",
-      "foto/gallery/f-ella2.jpg",
-    ],
-    tanggallahir: "26 januari",
-    zodiac: "Aquarius",
-    tinggibadan: "162cm",
-    goldarah: "B",
-    mbti: "INFP",
-    hobi: "Menari, Cosplay, Menggambar",
-    makananfavorit: "Salmon, Sushi, Lemper, Mie Ayam, Mangut iwak pe",
-    warnafavorit: "Turqoise, Ungu",
-  },
-  group: {
-    name: "Group Cheki",
-    fullName: "Group Cheki 🖤",
-    color: "text-slate-300",
-    photos: ["foto/group2.jpg"],
-    deskripsi:
-      "Stellaria adalah grup idola yang berasal dari Malang, Indonesia...",
-  },
-};
-
-// ====================================================================================
-// || KODE INTI WEBSITE (JANGAN DIUBAH) ||
-// ====================================================================================
-
-let cart = JSON.parse(localStorage.getItem("stellaria-cart")) || [];
-const formatter = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-  minimumFractionDigits: 0,
-});
-
-function updateItemQuantity(index, amount) {
-  if (cart[index]) {
-    cart[index].quantity += amount;
-    if (cart[index].quantity <= 0) {
-      cart.splice(index, 1);
-    }
-    localStorage.setItem("stellaria-cart", JSON.stringify(cart));
-    updateCartCount();
-    renderCartItems();
-  }
-}
-
-function renderCartItems() {
-  const cartContainer = document.getElementById("cart-items");
-  const totalElement = document.getElementById("cart-total");
-  if (!cartContainer || !totalElement) return;
-  
-  if (cart.length === 0) {
-    cartContainer.innerHTML =
-      '<p class="text-slate-400 text-center py-8">Your cart is empty</p>';
-    totalElement.textContent = formatter.format(0);
-    return;
-  }
-  let html = '<div class="divide-y divide-slate-700">';
-  let total = 0;
-  cart.forEach((item, index) => {
-    const price = item.name.includes("Group")
-      ? CONFIG.hargaGroupCheki
-      : CONFIG.hargaMemberCheki;
-    const itemTotal = price * item.quantity;
-    total += itemTotal;
-    html += `<div class="flex items-center py-4 gap-4">
-                          <img src="${item.image}" alt="${
-      item.name
-    }" class="w-16 h-16 object-cover rounded-lg shadow-sm">
-                          <div class="flex-1">
-                              <h4 class="font-semibold text-slate-200">${
-                                item.name
-                              }</h4>
-                              <p class="font-semibold text-purple-400 text-sm">${formatter.format(
-                                price
-                              )}</p>
-                              <button onclick="removeFromCart(${index})" class="mt-1 text-xs text-red-500 hover:text-red-400 hover:underline">Remove</button>
-                          </div>
-                          <div class="flex items-center gap-2">
-                              <button onclick="updateItemQuantity(${index}, -1)" class="w-7 h-7 bg-slate-700 rounded-full font-bold text-slate-300 hover:bg-slate-600">-</button>
-                              <span class="w-8 text-center font-semibold text-slate-200">${
-                                item.quantity
-                              }</span>
-                              <button onclick="updateItemQuantity(${index}, 1)" class="w-7 h-7 bg-slate-700 rounded-full font-bold text-slate-300 hover:bg-slate-600">+</button>
-                          </div>
-                       </div>`;
-  });
-  html += "</div>";
-  cartContainer.innerHTML = html;
-  totalElement.textContent = formatter.format(total);
-}
-
-function updateCartCount() {
-  const count = cart.reduce((total, item) => total + item.quantity, 0);
-  const cartCountEls = [
-    document.getElementById("cart-count"),
-    document.getElementById("cart-count-mobile"),
-  ];
-  cartCountEls.forEach((el) => {
-    if (el) {
-      el.textContent = count;
-      el.classList.toggle("hidden", count === 0);
-    }
-  });
-}
-
-function addToCart(name, fullName, image) {
-  const existingItemIndex = cart.findIndex(
-    (item) => item.name === fullName
-  );
-  if (existingItemIndex > -1) {
-    updateItemQuantity(existingItemIndex, 1);
-  } else {
-    cart.push({ name: fullName, image, quantity: 1 });
-  }
-  localStorage.setItem("stellaria-cart", JSON.stringify(cart));
-  updateCartCount();
-  renderCartItems();
-  const notification = document.createElement("div");
-  notification.className =
-    "fixed bottom-5 right-5 bg-purple-600 text-white px-5 py-3 rounded-lg shadow-2xl text-sm font-semibold transform-gpu transition-all duration-300 translate-y-4 opacity-0";
-  notification.textContent = `${name} added to cart!`;
-  document.body.appendChild(notification);
-  setTimeout(() => {
-    notification.classList.remove("translate-y-4", "opacity-0");
-  }, 10);
-  setTimeout(() => {
-    notification.classList.add("translate-y-4", "opacity-0");
-    setTimeout(() => notification.remove(), 300);
-  }, 2500);
-}
-
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  localStorage.setItem("stellaria-cart", JSON.stringify(cart));
-  updateCartCount();
-  renderCartItems();
-}
-
-function clearCart() {
-  cart = [];
-  localStorage.setItem("stellaria-cart", JSON.stringify(cart));
-  updateCartCount();
-  renderCartItems();
-}
-
-function getCartSummary() {
-  let items = "";
-  let total = 0;
-  cart.forEach((item) => {
-    const price = item.name.includes("Group")
-      ? CONFIG.hargaGroupCheki
-      : CONFIG.hargaMemberCheki;
-    const subtotal = price * item.quantity;
-    total += subtotal;
-    items += `${item.name} (${item.quantity}x @${formatter.format(price)}) = ${formatter.format(subtotal)}\n`;
-  });
-  return { items, total, totalFormatted: formatter.format(total) };
-}
-
-
-function openModal(memberId) {
-  const member = members[memberId];
-  if (!member) return;
-  const modalTitleEl = document.getElementById("modal-title");
-  const modalSocialsEl = document.getElementById("modal-socials");
-  const slider = document.getElementById("modal-image-slider");
-  const dotsContainer = document.getElementById("modal-slider-dots");
-
-  modalTitleEl.className = "text-2xl font-bold";
-  modalTitleEl.classList.add(member.color);
-  modalTitleEl.textContent = member.fullName;
-
-  slider.innerHTML = "";
-  dotsContainer.innerHTML = "";
-
-  member.photos.forEach((photoSrc, index) => {
-    slider.innerHTML += `<div class="slider-item"><img src="${photoSrc}" alt="Galeri foto ${
-      member.name
-    } ${index + 1}" class="w-full h-full object-cover"></div>`;
-    if (member.photos.length > 1) {
-      dotsContainer.innerHTML += `<div class="slider-dot ${
-        index === 0 ? "active" : ""
-      }"></div>`;
-    }
-  });
-
-  slider.onscroll = () => {
-    const dots = dotsContainer.querySelectorAll(".slider-dot");
-    const activeIndex = Math.round(
-      slider.scrollLeft / slider.clientWidth
-    );
-    dots.forEach((dot, index) =>
-      dot.classList.toggle("active", index === activeIndex)
-    );
-  };
-
-  let contentHtml = "";
-  if (memberId === "group") {
-    contentHtml = `<p class="text-slate-300 leading-relaxed">${
-      member.deskripsi || ""
-    }</p>`;
-    modalSocialsEl.innerHTML = "";
-  } else {
-    contentHtml = `<p class="text-center italic font-medium mb-4 ${
-      member.color
-    }">"${
-      member.jiko || "-"
-    }"</p><div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm"><p><strong class="font-medium text-slate-200">Tanggal Lahir:</strong><br>${
-      member.tanggallahir || "-"
-    }</p><p><strong class="font-medium text-slate-200">Zodiak:</strong><br>${
-      member.zodiac || "-"
-    }</p><p><strong class="font-medium text-slate-200">Tinggi Badan:</strong><br>${
-      member.tinggibadan || "-"
-    }</p><p><strong class="font-medium text-slate-200">Gol. Darah:</strong><br>${
-      member.goldarah || "-"
-    }</p><p><strong class="font-medium text-slate-200">MBTI:</strong><br>${
-      member.mbti || "-"
-    }</p><p><strong class="font-medium text-slate-200">Hobi:</strong><br>${
-      member.hobi || "-"
-    }</p><p class="col-span-2"><strong class="font-medium text-slate-200">Makanan Favorit:</strong><br>${
-      member.makananfavorit || "-"
-    }</p><p class="col-span-2"><strong class="font-medium text-slate-200">Warna Favorit:</strong><br>${
-      member.warnafavorit || "-"
-    }</p></div>`;
-
-    let socialsHtml = "";
-    if (member.ig) {
-      socialsHtml += `<a href="https://instagram.com/${member.ig}" target="_blank" class="text-slate-400 hover:text-pink-500 transition-colors"><i class="fab fa-instagram fa-2x"></i></a>`;
-    }
-    if (member.tiktok) {
-      socialsHtml += `<a href="https://tiktok.com/@${member.tiktok}" target="_blank" class="text-slate-400 hover:text-white transition-colors"><i class="fab fa-tiktok fa-2x"></i></a>`;
-    }
-    modalSocialsEl.innerHTML = socialsHtml;
-  }
-  document.getElementById("modal-content").innerHTML = contentHtml;
-  document.getElementById("modal").classList.add("active");
-}
-
-function closeModal() {
-  document.getElementById("modal").classList.remove("active");
-}
-function checkout() {
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
-  }
-  document.getElementById("checkout-modal").classList.add("active");
-}
-function closeCheckoutModal() {
-  document.getElementById("checkout-modal").classList.remove("active");
-}
-function closeThankYouModal() {
-  document.getElementById("thankyou-modal").classList.remove("active");
-}
-
-function validateForm() {
-  let isValid = true;
-  const fields = [
-    { id: "fullname", errorMsg: "Nama tidak boleh kosong." },
-    {
-      id: "email",
-      errorMsg: "Format email tidak valid.",
-      validator: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-    },
-    { id: "phone", errorMsg: "Nomor WhatsApp tidak boleh kosong." },
-    {
-      id: "payment-proof",
-      errorMsg: "Bukti pembayaran wajib di-upload.",
-      validator: (val, el) => el.files.length > 0,
-    },
-  ];
-
-  fields.forEach((field) => {
-    const input = document.getElementById(field.id);
-    const errorEl = input.nextElementSibling;
-    const value = input.value.trim();
-    let fieldIsValid = field.validator
-      ? field.validator(value, input)
-      : value !== "";
-
-    if (!fieldIsValid) {
-      isValid = false;
-      input.classList.add("invalid");
-      errorEl.style.display = "block";
-    } else {
-      input.classList.remove("invalid");
-      errorEl.style.display = "none";
-    }
-  });
-  return isValid;
-}
-
-async function completeOrder(event) {
-  event.preventDefault();
-  if (!validateForm()) return;
-
-  const form = event.target;
-  const submitButton = form.querySelector('button[type="submit"]');
-  submitButton.disabled = true;
-  submitButton.textContent = "Processing...";
-
-  const fileInput = document.getElementById("payment-proof");
-  const reader = new FileReader();
-  reader.readAsDataURL(fileInput.files[0]);
-
-  reader.onload = async () => {
-    const base64Data = reader.result.split(",")[1];
-    const cartData = getCartSummary();
-    const file = fileInput.files[0];
-
-    const payload = {
-      apiKey: API_KEY,
-      nama: document.getElementById("fullname").value,
-      email: document.getElementById("email").value,
-      no_wa: document.getElementById("phone").value,
-      ig: document.getElementById("instagram").value,
-      pesanan: cartData.items,
-      total: cartData.total,
-      totalFormatted: cartData.totalFormatted,
-      fileData: base64Data,
-      fileName: file.name,
-      mimeType: file.type
-    };
-
-    try {
-      const response = await fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-      const result = await response.json();
-
-      if (result.result === "success") {
-        clearCart();
-        closeCheckoutModal();
-        document.getElementById("thankyou-modal").classList.add("active");
-        form.reset();
-      } else {
-        alert("Gagal mengirim pesanan. Error: " + (result.message || "Unknown error"));
-      }
-    } catch (error) {
-      alert("Gagal mengirim pesanan. Terjadi kesalahan: " + error.message);
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = "Complete Order";
-    }
-  };
-  reader.onerror = () => {
-    alert("Gagal membaca file bukti pembayaran.");
-    submitButton.disabled = false;
-    submitButton.textContent = "Complete Order";
-  };
-}
-
-function renderSchedule() {
-  const container = document.getElementById("schedule-container");
-  if (!container) return;
-  container.innerHTML = "";
-  if (events.length === 0) {
-    container.innerHTML =
-      '<p class="text-center text-slate-400 col-span-full">Belum ada jadwal event.</p>';
-    return;
-  }
-
-  let firstUpcomingFound = false;
-
-  events.forEach((event) => {
-    const isFinished = event.status === "finished";
-    const cardClasses = isFinished
-      ? "bg-slate-800/60 opacity-60"
-      : "bg-slate-800 shadow-lg hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300 border border-slate-700";
-
-    let lineupDetailsHtml = "";
-    if (!isFinished && !firstUpcomingFound && event.title === NEXT_EVENT_LINEUP.eventTitle) {
-      let presentMembers = [];
-      let absentMembers = [];
-
-      for (const memberKey in NEXT_EVENT_LINEUP.lineup) {
-        if (NEXT_EVENT_LINEUP.lineup[memberKey]) {
-          presentMembers.push(members[memberKey].name);
-        } else {
-          absentMembers.push(members[memberKey].name);
-        }
-      }
-
-      let lineupHtml = presentMembers
-        .map(
-          (member) =>
-            `<li class="flex items-center"><span class="mr-2">✅</span>${member}</li>`
-        )
-        .join("");
-      let absentHtml = "";
-      if (absentMembers.length > 0) {
-        absentHtml = `<h4 class="font-bold text-sm text-red-500 mt-3 mb-1">Berhalangan</h4><ul class="space-y-1 text-sm text-slate-300">${absentMembers
-          .map(
-            (member) =>
-              `<li class="flex items-center"><span class="mr-2">❌</span>${member}</li>`
-          )
-          .join("")}</ul>`;
-      }
-
-      lineupDetailsHtml = `<div class="text-left mt-4 pt-4 border-t border-purple-800/50"><h4 class="font-bold text-sm text-green-500 mb-1">Lineup</h4><ul class="space-y-1 text-sm text-slate-300">${lineupHtml}</ul>${absentHtml}</div>`;
-      firstUpcomingFound = true;
-    }
-
-    const eventCardHtml = `<div class="${cardClasses} p-6 rounded-2xl flex flex-col"><div class="flex-grow"><p class="text-sm font-semibold text-purple-400 mb-1">${
-      event.date
-    } ${
-      isFinished
-        ? '<span class="text-xs font-normal text-red-500">(Selesai)</span>'
-        : ""
-    }</p><h3 class="text-xl font-bold text-slate-200">${
-      event.title
-    }</h3><p class="text-sm text-slate-400 mt-1 mb-4">${
-      event.time
-    }</p>${lineupDetailsHtml}</div></div>`;
-    container.innerHTML += eventCardHtml;
-  });
-}
-
-function renderFaq() {
-  const container = document.getElementById("faq-container");
-  if (!container) return;
-  container.innerHTML = "";
-
-  faqs.forEach((faq) => {
-    const faqItemHtml = `
-      <div class="faq-item bg-slate-800 rounded-xl shadow-sm overflow-hidden border border-slate-700">
-          <button class="faq-question w-full flex justify-between items-center text-left p-4 md:p-5">
-              <span class="font-semibold text-purple-300">${faq.question}</span>
-              <span class="faq-icon text-purple-400 text-xl font-light transform transition-transform duration-300">
-                  <i class="fas fa-chevron-down"></i>
-              </span>
-          </button>
-          <div class="faq-answer text-slate-400">
-              <p class="pb-4 px-4 md:px-5">${faq.answer}</p>
-          </div>
-      </div>
-    `;
-    container.innerHTML += faqItemHtml;
-  });
-
-  // Tambahkan event listener untuk membuka/menutup FAQ setelah dirender
-  document.querySelectorAll(".faq-question").forEach((button) => {
-    button.addEventListener("click", () => {
-      const faqItem = button.parentElement;
-      faqItem.classList.toggle("active");
-    });
-  });
-}
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Menampilkan harga dari konfigurasi
-  document.getElementById("price-member").textContent = formatter.format(
-    CONFIG.hargaMemberCheki
-  );
-  document.getElementById("price-group").textContent = formatter.format(
-    CONFIG.hargaGroupCheki
-  );
-
-  // Merender komponen dinamis
-  renderSchedule();
-  renderFaq();
-
-  // Memperbarui tampilan keranjang belanja saat halaman dimuat
-  updateCartCount();
-  renderCartItems();
-
-  // Menambahkan event listener ke form checkout
-  const checkoutForm = document.getElementById("checkout-form");
-  if(checkoutForm) {
-    checkoutForm.addEventListener("submit", completeOrder);
-  }
-
-  // Fungsionalitas untuk menu mobile (hamburger menu)
-  const menuToggle = document.getElementById("menu-toggle");
-  const mobileMenu = document.getElementById("mobile-menu");
-  if (menuToggle && mobileMenu) {
-    const mobileNavLinks = mobileMenu.querySelectorAll("a.nav-link");
-    menuToggle.addEventListener("click", () => {
-      mobileMenu.classList.toggle("hidden");
-    });
-    // Sembunyikan menu setelah link di-klik
-    mobileNavLinks.forEach((link) => {
-      link.addEventListener("click", () => {
-        mobileMenu.classList.add("hidden");
-      });
-    });
-  }
-
-  // Mengatur link navigasi aktif berdasarkan posisi scroll
-  const sections = document.querySelectorAll("main section");
-  const navLinks = document.querySelectorAll(
-    "#desktop-menu a.nav-link, #mobile-menu a.nav-link"
-  );
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          navLinks.forEach((link) => {
-            link.classList.remove("active");
-            if (
-              link.getAttribute("href").substring(1) === entry.target.id
-            ) {
-              link.classList.add("active");
+        themeOptions.addEventListener('click', (e) => {
+            if (e.target.classList.contains('theme-option')) {
+                themeOptions.querySelector('.selected')?.classList.remove('selected');
+                e.target.classList.add('selected');
+                const newColor = e.target.dataset.color;
+                updateThemeColor(newColor);
             }
-          });
-        }
-      });
-    },
-    { rootMargin: "-40% 0px -60% 0px" }
-  );
-  sections.forEach((section) => {
-    observer.observe(section);
-  });
+        });
 
-  // Fungsionalitas untuk menutup modal
-  document.querySelectorAll(".modal").forEach((modal) => {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.classList.remove("active");
-      }
-    });
-  });
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      document
-        .querySelectorAll(".modal.active")
-        .forEach((modal) => modal.classList.remove("active"));
+        giftBox.addEventListener('click', () => {
+            const selectedYear = yearSlider.value;
+            const selectedColorElement = themeOptions.querySelector('.selected');
+            const selectedColor = selectedColorElement.dataset.color;
+            const encodedColor = encodeURIComponent(selectedColor);
+            window.location.href = `ucapan.html?year=${selectedYear}&color=${encodedColor}`;
+        });
+
+        const initialColor = themeOptions.querySelector('.selected').dataset.color;
+        updateThemeColor(initialColor);
     }
-  });
 
-  // =======================================================
-  // || KODE BARU: Pemicu untuk Login Admin               ||
-  // =======================================================
-  const copyrightFooter = document.getElementById("copyright-footer");
-  let clickCount = 0;
-  let clickTimer = null;
+    // ===================================================================
+    // LOGIKA UNTUK HALAMAN ucapan.html (HALAMAN UCAPAN)
+    // ===================================================================
+    if (document.getElementById('main-content') && !document.getElementById('welcome-screen')) {
+        
+        const appState = { content: {} };
 
-  if (copyrightFooter) {
-    copyrightFooter.addEventListener('click', () => {
-      clickCount++;
+        const elements = {
+            root: document.documentElement,
+            backgroundAnimation: document.getElementById('background-animation'),
+            progressBar: document.getElementById('progress-bar'),
+            greetingLine1: document.getElementById('greeting-line-1'),
+            greetingLine2: document.getElementById('greeting-line-2'),
+            personalMessage: document.getElementById('personal-message'),
+            personalSignature: document.getElementById('personal-signature'),
+            timelineContainer: document.getElementById('timeline-container'),
+            photoGallery: document.getElementById('photo-gallery'),
+            videoList: document.getElementById('video-list'),
+            lightbox: document.getElementById('lightbox'),
+            lightboxImg: document.getElementById('lightbox-img'),
+            lightboxClose: document.querySelector('.lightbox-close'),
+            audioElement: document.getElementById('audio-element'),
+            playerArtwork: document.getElementById('player-artwork'),
+            playerTitle: document.getElementById('player-title'),
+            playerArtist: document.getElementById('player-artist'),
+            playPauseBtn: document.getElementById('play-pause-btn'),
+            prevBtn: document.getElementById('prev-btn'),
+            nextBtn: document.getElementById('next-btn')
+        };
 
-      if (clickTimer) {
-        clearTimeout(clickTimer);
-      }
-      
-      if (clickCount >= 5) {
-        window.open('admin.html', '_blank');
-        clickCount = 0; 
-      }
-      
-      clickTimer = setTimeout(() => {
-        clickCount = 0;
-      }, 1000); 
-    });
-  }
+        const utils = {
+            async typewriter(element, text, delay = 80) {
+                // Kosongkan elemen sebelum memulai
+                element.innerHTML = '';
+                element.classList.add('typing');
+                for (let i = 0; i < text.length; i++) {
+                    element.innerHTML = text.substring(0, i + 1) + '<span class="cursor">|</span>';
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                // Hapus kursor setelah selesai
+                setTimeout(() => {
+                    element.innerHTML = text;
+                    element.classList.remove('typing');
+                }, 500);
+            },
+            triggerConfetti() {
+                const confettiCount = 150;
+                const colors = ['#ff6b9d', '#4ecdc4', '#feca57', '#ff9ff3', '#54a0ff'];
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = `${Math.random() * 2}s`;
+                    confetti.style.animationDuration = `${Math.random() * 3 + 4}s`;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti?.remove(), 8000);
+                }
+            },
+            createBgParticles(count = 35) {
+                const shapes = ['💖', '✨', '🌟', '🎶', '🎉', '♍', '🎀', '🎂'];
+                for (let i = 0; i < count; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'bg-particle';
+                    particle.innerHTML = shapes[Math.floor(Math.random() * shapes.length)];
+                    const size = Math.random() * 40 + 30;
+                    particle.style.fontSize = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}vw`;
+                    particle.style.animationDuration = `${Math.random() * 15 + 20}s`;
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    elements.backgroundAnimation.appendChild(particle);
+                }
+            },
+            updateScrollProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollProgress = (scrollTop / scrollHeight) * 100;
+                elements.progressBar.style.width = `${Math.min(scrollProgress, 100)}%`;
+            },
+            observeElements() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('visible');
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+                document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+            },
+            updateThemeColor(color) {
+                elements.root.style.setProperty('--accent-color', color);
+                const colorMap = {'#ff6b9d':'#4ecdc4', '#4ecdc4':'#ff6b9d', '#a88679':'#ff6b9d', '#e91e63':'#4ecdc4', '#673ab7':'#4ecdc4', '#00bcd4':'#ff6b9d', '#4caf50':'#ff6b9d', '#ff9800':'#4ecdc4'};
+                elements.root.style.setProperty('--accent-secondary', colorMap[color] || '#4ecdc4');
+                elements.root.style.setProperty('--glow-color', color + '40');
+            }
+        };
+
+        const contentRenderer = {
+            renderTimeline() {
+                elements.timelineContainer.innerHTML = appState.content.timelineItems.map((item, index) => {
+                    const side = index % 2 === 0 ? 'left' : 'right';
+                    const imageHtml = item.image ? `<img src="${item.image}" alt="${item.title}" class="timeline-image">` : '';
+                    return `
+                        <div class="timeline-item ${side}">
+                            <div class="timeline-content">
+                                ${imageHtml}
+                                <h3>${item.year} - ${item.title}</h3>
+                                <p>${item.description}</p>
+                            </div>
+                        </div>`;
+                }).join('');
+            },
+            renderGallery() {
+                elements.photoGallery.innerHTML = appState.content.galleryImages.map((src, i) => `<img src="${src}" alt="Foto Kenangan ${i + 1}" loading="lazy">`).join('');
+            },
+            renderVideos() {
+                elements.videoList.innerHTML = appState.content.videos.map(video => `<div class="video-wrapper"><iframe src="${video.url}" title="${video.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`).join('');
+            }
+        };
+
+        const musicPlayer = {
+            init() {
+                if (appState.content.playlist?.length) this.loadTrack(0, false);
+            },
+            loadTrack(index, autoplay = true) {
+                const track = appState.content.playlist[index];
+                appState.currentTrackIndex = index;
+                elements.audioElement.src = track.path;
+                elements.playerArtwork.src = track.artwork;
+                elements.playerTitle.textContent = track.title;
+                elements.playerArtist.textContent = track.artist;
+                this.updatePlayButton(false);
+                if (autoplay) this.play();
+            },
+            play() {
+                if (!appState.content.playlist?.length) return;
+                elements.audioElement.play();
+                this.updatePlayButton(true);
+            },
+            pause() {
+                elements.audioElement.pause();
+                this.updatePlayButton(false);
+            },
+            togglePlayPause() {
+                elements.audioElement.paused ? this.play() : this.pause();
+            },
+            previousTrack() {
+                const prev = (appState.currentTrackIndex - 1 + appState.content.playlist.length) % appState.content.playlist.length;
+                this.loadTrack(prev);
+            },
+            nextTrack() {
+                const next = (appState.currentTrackIndex + 1) % appState.content.playlist.length;
+                this.loadTrack(next);
+            },
+            updatePlayButton(isPlaying) {
+                elements.playPauseBtn.innerHTML = isPlaying ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="currentColor"/></svg>` : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 5V19L19 12L8 5Z" fill="currentColor"/></svg>`;
+            }
+        };
+
+        const eventHandlers = {
+            init() {
+                elements.photoGallery.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'IMG') {
+                        elements.lightbox.style.display = 'block';
+                        elements.lightboxImg.src = e.target.src;
+                    }
+                });
+                elements.lightboxClose.addEventListener('click', this.closeLightbox);
+                elements.lightbox.addEventListener('click', (e) => {
+                    if (e.target === elements.lightbox) this.closeLightbox();
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') this.closeLightbox();
+                });
+                elements.playPauseBtn.addEventListener('click', () => musicPlayer.togglePlayPause());
+                elements.prevBtn.addEventListener('click', () => musicPlayer.previousTrack());
+                elements.nextBtn.addEventListener('click', () => musicPlayer.nextTrack());
+                elements.audioElement.addEventListener('ended', () => musicPlayer.nextTrack());
+                window.addEventListener('scroll', utils.updateScrollProgress, { passive: true });
+            },
+            closeLightbox() {
+                elements.lightbox.style.display = 'none';
+            }
+        };
+
+        const app = {
+            async init() {
+                try {
+                    const response = await fetch('content.json');
+                    if (!response.ok) throw new Error('Failed to load content');
+                    appState.content = await response.json();
+                    
+                    const params = new URLSearchParams(window.location.search);
+                    const year = params.get('year') || 2006;
+                    const color = decodeURIComponent(params.get('color') || '#ff6b9d');
+                    utils.updateThemeColor(color);
+                    
+                    // Inisialisasi semua konten visual dulu
+                    utils.createBgParticles();
+                    contentRenderer.renderTimeline();
+                    contentRenderer.renderGallery();
+                    contentRenderer.renderVideos();
+                    musicPlayer.init();
+                    eventHandlers.init();
+                    utils.observeElements();
+                    utils.updateScrollProgress();
+                    utils.triggerConfetti();
+
+                    // Siapkan teks, tapi jangan langsung animasikan
+                    const age = new Date().getFullYear() - parseInt(year, 10);
+                    const greeting1 = appState.content.personalGreeting;
+                    const greeting2 = `yang ke-${age}! 🎉`;
+                    const personalMessage = appState.content.personalMessage;
+                    const signature = appState.content.personalSignature;
+
+                    // Mulai animasi teks secara berurutan
+                    await utils.typewriter(elements.greetingLine1, greeting1, 100);
+                    await utils.typewriter(elements.greetingLine2, greeting2, 120);
+                    
+                    // Beri jeda sebelum pesan pribadi muncul
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    await utils.typewriter(elements.personalMessage, personalMessage, 30);
+
+                    // Tampilkan signature setelah semua animasi teks selesai
+                    elements.personalSignature.textContent = signature;
+                    elements.personalSignature.style.opacity = 1;
+
+                    // Mulai musik setelah jeda singkat
+                    setTimeout(() => musicPlayer.play(), 500);
+
+                } catch (error) {
+                    console.error('Error initializing app:', error);
+                    document.body.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; color: var(--text-light); font-family: 'Poppins', sans-serif; padding: 1rem;"><div><h1>😔 Oops! Terjadi Kesalahan</h1><p>Tidak dapat memuat konten website. Pastikan file <strong>content.json</strong> ada di folder yang sama.</p><button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer;">🔄 Coba Lagi</button></div></div>`;
+                }
+            }
+        };
+        app.init();
+    }
 });
